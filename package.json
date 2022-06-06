@@ -1,12 +1,28 @@
 {
   "name": "network",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.0.1",
+  "description": "Unify your network calls in javascript",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yooneskh/unified-network.git"
+  },
+  "keywords": ["javascript", "network", "api", "unify"],
+  "author": "Yoones Khoshghadam",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yooneskh/unified-network/issues"
+  },
+  "homepage": "https://github.com/yooneskh/unified-network",
+  "devDependencies": {
+    "typescript": "^4.7.3"
+  },
+  "files": [
+    "lib/**/*"
+  ]
 }
