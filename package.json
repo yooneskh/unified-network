@@ -1,5 +1,5 @@
 {
-  "name": "network",
+  "name": "unified-network",
   "version": "0.0.1",
   "description": "Unify your network calls in javascript",
   "main": "lib/index.js",
