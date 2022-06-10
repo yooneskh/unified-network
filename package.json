@@ -1,6 +1,6 @@
 {
   "name": "unified-network",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Unify your network calls in javascript",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -12,7 +12,12 @@
     "type": "git",
     "url": "git+https://github.com/yooneskh/unified-network.git"
   },
-  "keywords": ["javascript", "network", "api", "unify"],
+  "keywords": [
+    "javascript",
+    "network",
+    "api",
+    "unify"
+  ],
   "author": "Yoones Khoshghadam",
   "license": "ISC",
   "bugs": {
