@@ -5,6 +5,8 @@ export interface IUnifiedRequest {
   method?: string;
   baseUrl?: string;
   url: string;
+  queries?: { [key: string]: string };
+  parameters?: { [key: string]: string };
   headers?: { [key: string]: string };
   body?: any;
 }
@@ -22,9 +24,21 @@ export class UnifiedNetwork {
 
   async request(config: IUnifiedRequest) {
 
-    let { method, baseUrl, url, body } = { ...(this.base ?? {}), ...config };
+    let { method, baseUrl, url, parameters, queries, body } = { ...(this.base ?? {}), ...config };
+
 
     let fullUrl = baseUrl ? joinPaths(baseUrl, url) : url;
+
+    if (parameters) {
+      for (const key in parameters) {
+        fullUrl = fullUrl.replaceAll(`[${key}]`, parameters[key]);
+      }
+    }
+
+    if (queries) {
+      fullUrl = fullUrl + (fullUrl.includes('?') ? '&' : '?') + Object.keys(queries).map(key => `${key}=${queries![key]}`).join('&');
+    }
+
 
     let headers = {
       ...(this.base?.headers ?? {}),
