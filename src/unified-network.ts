@@ -26,6 +26,7 @@ export class UnifiedNetwork {
 
     let { method, baseUrl, url, parameters, queries, body } = { ...(this.base ?? {}), ...config };
 
+    url ??= '/';
 
     let fullUrl = baseUrl ? joinPaths(baseUrl, url) : url;
 
@@ -54,38 +55,51 @@ export class UnifiedNetwork {
 
     let status = undefined;
     let data = undefined;
+    let responseHeaders = {} as Record<string, string>;
 
 
-    const response = await fetch(fullUrl, {
-      method: method ?? 'get',
-      body,
-      headers,
-    });
+    try {
+
+      const response = await fetch(fullUrl, {
+        method: method ?? 'get',
+        body,
+        headers,
+      });
 
 
-    status = response.status;
+      status = response.status;
+      responseHeaders = Object.fromEntries((response.headers as any).entries());
 
-    if (response.ok) {
+      if (response.ok) {
 
-      data = await response.text();
+        data = await response.text();
 
-      if ((response.headers.get('content-type')?.indexOf('application/json') ?? -1) >= 0) {
-        try {
-          data = JSON.parse(data);
+        if ((response.headers.get('content-type')?.indexOf('application/json') ?? -1) >= 0) {
+          try {
+            data = JSON.parse(data);
+          }
+          catch (error) {
+            console.error('could not parse response data');
+            console.error(error);
+          }
         }
-        catch (error) {
-          console.error('could not parse response data');
-          console.error(error);
-        }
+
+      }
+      else {
+        data = await response.text();
       }
 
+    }
+    catch {
+      status = -1;
+      data = undefined;
     }
 
 
     return {
       status,
       data,
-      headers: Object.fromEntries((response.headers as any).entries()),
+      headers: responseHeaders,
     };
 
   }
