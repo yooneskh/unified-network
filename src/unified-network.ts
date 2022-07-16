@@ -9,6 +9,69 @@ export interface IUnifiedRequest {
   parameters?: { [key: string]: string };
   headers?: { [key: string]: string };
   body?: any;
+  processor?: IUnifiedRequestProcessor;
+}
+
+export interface IUnifiedRequestProcessorConfig {
+  method: 'get' | 'post' | 'patch' | 'put' | 'delete' | 'head';
+  url: string;
+  headers?: { [key: string]: string };
+  body?: any;
+}
+
+export interface IUnifiedResponse {
+  status: number;
+  headers: { [key: string]: string };
+  data?: any;
+}
+
+export type IUnifiedRequestProcessor = (
+  (config: IUnifiedRequestProcessorConfig) => Promise<IUnifiedResponse>
+);
+
+
+async function httpProcessorFetch({ method, url, headers, body }: IUnifiedRequestProcessorConfig) {
+
+  let responseStatus = undefined;
+  let responseData = undefined;
+  let responseHeaders = undefined;
+
+
+  const response = await fetch(url, {
+    method,
+    body,
+    headers,
+  });
+
+
+  responseStatus = response.status;
+  responseHeaders = Object.fromEntries((response.headers as any).entries()) as Record<string, string>;
+
+  if (response.ok) {
+
+    responseData = await response.text();
+
+    if (responseHeaders['content-type']?.toLowerCase().includes('application/json')) {
+      try {
+        responseData = JSON.parse(responseData);
+      }
+      catch (error) {
+        throw new Error('could not parse response data ' + (error as Error).message);
+      }
+    }
+
+  }
+  else {
+    responseData = await response.text();
+  }
+
+
+  return {
+    status: responseStatus,
+    headers: responseHeaders,
+    data: responseData
+  };
+
 }
 
 
@@ -24,9 +87,18 @@ export class UnifiedNetwork {
 
   async request(config: IUnifiedRequest) {
 
-    let { method, baseUrl, url, parameters, queries, body } = { ...(this.base ?? {}), ...config };
+    let {
+      method,
+      baseUrl,
+      url,
+      parameters,
+      queries,
+      body,
+      processor
+    } = { ...(this.base ?? {}), ...config };
 
     url ??= '/';
+    processor ??= httpProcessorFetch;
 
     let fullUrl = baseUrl ? joinPaths(baseUrl, url) : url;
 
@@ -53,53 +125,39 @@ export class UnifiedNetwork {
     }
 
 
-    let status = undefined;
-    let data = undefined;
+    let responseStatus = undefined;
+    let responseData = undefined;
     let responseHeaders = {} as Record<string, string>;
 
 
     try {
 
-      const response = await fetch(fullUrl, {
+      const { status: processorStatus, data: processorData, headers: processorHeaders } = await processor({
+        url: fullUrl,
         method: method ?? 'get',
-        body,
         headers,
+        body,
       });
 
-
-      status = response.status;
-      responseHeaders = Object.fromEntries((response.headers as any).entries());
-
-      if (response.ok) {
-
-        data = await response.text();
-
-        if ((response.headers.get('content-type')?.indexOf('application/json') ?? -1) >= 0) {
-          try {
-            data = JSON.parse(data);
-          }
-          catch (error) {
-            console.error('could not parse response data');
-            console.error(error);
-          }
-        }
-
-      }
-      else {
-        data = await response.text();
-      }
+      responseStatus = processorStatus;
+      responseHeaders = processorHeaders;
+      responseData = processorData;
 
     }
-    catch {
-      status = -1;
-      data = undefined;
+    catch (error: unknown) {
+
+      console.error(error)
+
+      responseStatus = -1;
+      responseData = undefined;
+
     }
 
 
     return {
-      status,
-      data,
-      headers: responseHeaders,
+      status: responseStatus,
+      data: responseData,
+      headers: responseHeaders
     };
 
   }
