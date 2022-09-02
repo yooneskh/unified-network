@@ -1,6 +1,6 @@
 {
   "name": "unified-network",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Unify your network calls in javascript",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
