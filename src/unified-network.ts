@@ -205,4 +205,13 @@ export class UnifiedNetwork {
     });
   }
 
+
+  applyHeader(header: string, value: string) {
+    this.base.headers![header] = value;
+  }
+
+  removeHeader(header: string) {
+    delete this.base.headers![header];
+  }
+
 }
