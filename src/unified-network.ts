@@ -10,6 +10,7 @@ export interface IUnifiedRequest {
   headers?: { [key: string]: string };
   body?: any;
   processor?: IUnifiedRequestProcessor;
+  [optionalProp: string]: unknown;
 }
 
 export interface IUnifiedRequestProcessorConfig {
@@ -17,6 +18,7 @@ export interface IUnifiedRequestProcessorConfig {
   url: string;
   headers?: { [key: string]: string };
   body?: any;
+  [optionalProp: string]: unknown;
 }
 
 export interface IUnifiedResponse {
@@ -30,7 +32,7 @@ export type IUnifiedRequestProcessor = (
 );
 
 
-async function httpProcessorFetch({ method, url, headers, body }: IUnifiedRequestProcessorConfig) {
+export async function httpProcessorFetch({ method, url, headers, body, }: IUnifiedRequestProcessorConfig) {
 
   let responseStatus = undefined;
   let responseData = undefined;
@@ -94,7 +96,8 @@ export class UnifiedNetwork {
       parameters,
       queries,
       body,
-      processor
+      processor,
+      ...otherProps
     } = { ...(this.base ?? {}), ...config };
 
     url ??= '/';
@@ -133,6 +136,7 @@ export class UnifiedNetwork {
     try {
 
       const { status: processorStatus, data: processorData, headers: processorHeaders } = await processor({
+        ...otherProps,
         url: fullUrl,
         method: method ?? 'get',
         headers,
