@@ -163,49 +163,6 @@ export class UnifiedNetwork {
   }
 
 
-  async get(config: IUnifiedRequest) {
-    return this.request({
-      ...config,
-      method: 'get',
-    });
-  }
-
-  async post(config: IUnifiedRequest) {
-    return this.request({
-      ...config,
-      method: 'post',
-    });
-  }
-
-  async put(config: IUnifiedRequest) {
-    return this.request({
-      ...config,
-      method: 'put',
-    });
-  }
-
-  async patch(config: IUnifiedRequest) {
-    return this.request({
-      ...config,
-      method: 'patch',
-    });
-  }
-
-  async delete(config: IUnifiedRequest) {
-    return this.request({
-      ...config,
-      method: 'delete',
-    });
-  }
-
-  async head(config: IUnifiedRequest) {
-    return this.request({
-      ...config,
-      method: 'head',
-    });
-  }
-
-
   setHeader(header: string, value: string) {
     this.base.headers![header] = value;
   }
