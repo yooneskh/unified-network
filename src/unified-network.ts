@@ -206,12 +206,21 @@ export class UnifiedNetwork {
   }
 
 
-  applyHeader(header: string, value: string) {
+  setHeader(header: string, value: string) {
     this.base.headers![header] = value;
   }
 
   removeHeader(header: string) {
     delete this.base.headers![header];
+  }
+
+  applyHeader(header: string, value: string) {
+    if (value === undefined || value == null || value === '') {
+      this.removeHeader(header);
+    }
+    else {
+      this.setHeader(header, value);
+    }
   }
 
 }
