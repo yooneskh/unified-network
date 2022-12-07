@@ -122,7 +122,7 @@ export class UnifiedNetwork {
     };
 
 
-    if (typeof body === 'object' && body !== null) {
+    if (typeof body === 'object' && body !== null && !(body instanceof FormData) && !(body instanceof URLSearchParams)) {
       body = JSON.stringify(body);
       headers['Content-Type'] = 'application/json';
     }
