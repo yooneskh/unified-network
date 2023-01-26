@@ -91,7 +91,7 @@ export class UnifiedNetwork {
 
     const method = config.method ?? this.base.method;
     const baseUrl = config.baseUrl ?? this.base.baseUrl;
-    const url = config.method ?? this.base.method ?? '/';
+    const url = config.url ?? this.base.url ?? '/';
 
     const parameters = {
       ...(this.base.parameters ?? {}),
