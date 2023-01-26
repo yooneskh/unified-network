@@ -89,29 +89,43 @@ export class UnifiedNetwork {
 
   async request(config: IUnifiedRequest) {
 
-    let {
-      method,
-      baseUrl,
-      url,
-      parameters,
-      queries,
-      body,
-      processor,
-      ...otherProps
-    } = { ...(this.base ?? {}), ...config };
+    const method = config.method ?? this.base.method;
+    const baseUrl = config.baseUrl ?? this.base.baseUrl;
+    const url = config.method ?? this.base.method ?? '/';
 
-    url ??= '/';
-    processor ??= httpProcessorFetch;
+    const parameters = {
+      ...(this.base.parameters ?? {}),
+      ...(config.parameters ?? {}),
+    };
+
+    const queries = {
+      ...(this.base.queries ?? {}),
+      ...(config.queries ?? {}),
+    };
+
+    let body = config.body ?? this.base.body;
+    const processor = config.processor ?? this.base.processor ?? httpProcessorFetch;
+
+
+    const otherProps: any = { ...this.base, ...config };
+    delete otherProps['method'];
+    delete otherProps['baseUrl'];
+    delete otherProps['url'];
+    delete otherProps['parameters'];
+    delete otherProps['queries'];
+    delete otherProps['body'];
+    delete otherProps['processor'];
+
 
     let fullUrl = baseUrl ? joinPaths(baseUrl, url) : url;
 
-    if (parameters) {
+    if (parameters && Object.keys(parameters).length > 0) {
       for (const key in parameters) {
         fullUrl = fullUrl.replaceAll(`[${key}]`, parameters[key]);
       }
     }
 
-    if (queries) {
+    if (queries && Object.keys(queries).length > 0) {
       fullUrl = fullUrl + (fullUrl.includes('?') ? '&' : '?') + Object.keys(queries).map(key => `${key}=${queries![key]}`).join('&');
     }
 
